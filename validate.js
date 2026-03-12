@@ -1,5 +1,5 @@
 /*!
- * validate.js 0.13.1
+ * validate.js 0.13.2
  *
  * (c) 2013-2019 Nicklas Ansman, 2013 Wrapp
  * Validate.js may be freely distributed under the MIT license.
