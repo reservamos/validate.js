@@ -77,8 +77,21 @@ describe('validators.email', function() {
     var suffix = new Array(31).join("\\a");
     var malicious = "name@[192.168.168.1:80" + suffix;
     var start = new Date().getTime();
-    email(malicious, {});
+    var result = email(malicious, {});
     var elapsed = new Date().getTime() - start;
+    expect(result).toEqual("is not a valid email");
+    expect(elapsed).toBeLessThan(1000);
+  });
+
+  it("is not susceptible to ReDoS via backslash character class overlap", function() {
+    // Verifies that \x5c (backslash) in the unescaped domain-literal character class
+    // does not cause catastrophic backtracking by overlapping with the escape branch.
+    var suffix = new Array(31).join("\\a");
+    var malicious = "name@[192.168.168.1:80" + suffix;
+    var start = new Date().getTime();
+    var result = email(malicious, {});
+    var elapsed = new Date().getTime() - start;
+    expect(result).toEqual("is not a valid email");
     expect(elapsed).toBeLessThan(1000);
   });
 });
