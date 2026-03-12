@@ -68,4 +68,17 @@ describe('validators.email', function() {
       , value = "foo";
     expect(email(value, options)).toBe(message);
   });
+
+  // CVE-2020-26308: ReDoS via crafted email with IP address literal
+  it("is not susceptible to ReDoS (CVE-2020-26308)", function() {
+    // This input exploits the overlapping [\x21-\x5a\x53-\x7f] alternation in
+    // the IP address literal branch. Before the fix, each extra \a pair roughly
+    // doubled processing time. With the fix the regex completes instantly.
+    var suffix = new Array(31).join("\\a");
+    var malicious = "name@[192.168.168.1:80" + suffix;
+    var start = new Date().getTime();
+    email(malicious, {});
+    var elapsed = new Date().getTime() - start;
+    expect(elapsed).toBeLessThan(1000);
+  });
 });
