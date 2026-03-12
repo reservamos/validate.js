@@ -94,4 +94,17 @@ describe('validators.email', function() {
     expect(result).toEqual("is not a valid email");
     expect(elapsed).toBeLessThan(1000);
   });
+
+  it("is not susceptible to ReDoS via backslash overlap with large payload", function() {
+    // Uses a larger payload (50 pairs) to expose exponential backtracking if \x5c
+    // overlaps with the escape branch — catastrophic cases double per added pair,
+    // so 50 pairs would timeout well beyond 1 second if the vulnerability is present.
+    var suffix = new Array(101).join("\\a");
+    var malicious = "name@[192.168.168.1:80" + suffix;
+    var start = new Date().getTime();
+    var result = email(malicious, {});
+    var elapsed = new Date().getTime() - start;
+    expect(result).toEqual("is not a valid email");
+    expect(elapsed).toBeLessThan(1000);
+  });
 });
